@@ -1,0 +1,24 @@
+{
+  "name": "curl-to-ts",
+  "version": "1.0.0",
+  "description": "Zero-dependency cURL to TypeScript SDK and type generator CLI.",
+  "bin": {
+    "curl-to-ts": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run.js"
+  },
+  "keywords": [
+    "curl",
+    "typescript",
+    "types",
+    "codegen",
+    "sdk",
+    "api"
+  ],
+  "author": "Dhani078 <dhanisepeda@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
