@@ -1,25 +1,37 @@
 ---
 name: curl-to-ts
-description: Instant zero-dependency cURL to TypeScript SDK generator. Use when user provides a cURL command or API request and needs a clean, fully-typed fetch function, interface definitions, or client SDK.
+description: Instant cURL command to TypeScript interface generator CLI and agent skill. Parses HTTP headers, query params, and JSON payloads into clean TypeScript types.
+risk: safe
 version: 1.0.0
-author: Dhani078
 ---
 
-Curl to TypeScript Skill
+NAME
+curl-to-ts - cURL command to TypeScript interface generator
 
-Use when integrating third-party APIs, converting browser cURL copies, or scaffolding API client libraries.
+SYNOPSIS
+npx curl-to-ts [curl-command] [options]
 
-Instructions
+COMMANDS
+- parse [curl-command]: Convert cURL string into TypeScript interfaces.
+- --stdin: Read cURL string from standard input stream.
 
-1. Receive and parse raw cURL snippet:
-   ```bash
-   npx curl-to-ts "<curl-command>" --out src/api/<endpoint>.ts
-   ```
+OPTIONS
+- --name <name>: Set name of primary generated interface.
+- --readonly: Add readonly modifier to all generated properties.
+- --optional: Mark nullable fields as optional.
+- --json: Emit structured schema representation.
 
-2. Validate inferred types:
-   - Verify parameter types (string, number, boolean, object).
-   - Ensure sensitive tokens (Bearer, Basic auth) are parameterized rather than hardcoded.
+DETERMINISTIC BEHAVIOR AND INVARIANTS
+1. The tool must accept valid cURL strings containing -X, -H, -d, --data, or bare URLs.
+2. If the payload is invalid JSON, the tool must output a descriptive syntax error and exit with code 1.
+3. Nested objects must be extracted into distinct PascalCase interfaces rather than inline type literals.
+4. Output must be strictly deterministic: identical cURL input produces byte-identical TypeScript output.
 
-3. Integration:
-   - Import the generated function into your UI component or backend service.
-   - Run typecheck (`tsc --noEmit`) to verify clean compilation.
+AGENT INTEGRATION INSTRUCTIONS
+When generating types from external API docs or network logs:
+1. Extract cURL snippet.
+2. Execute npx curl-to-ts "<curl-string>" --name <TargetName>.
+3. Import or append generated interfaces directly into TypeScript source files.
+
+AUTHOR
+Dhani078 (dhanisepeda@gmail.com)

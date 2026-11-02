@@ -1,42 +1,59 @@
 EXAMPLES: curl-to-ts
 
-1. Convert Simple GET Request
-Command:
+Scenario 1: Simple POST Request with JSON Body
 ```bash
-npx curl-to-ts 'curl https://api.github.com/users/Dhani078'
-```
+$ npx curl-to-ts "curl -X POST https://api.shop.com/cart -d '{\"cartId\": 42, \"active\": true}'"
 
-Output:
-```typescript
-export interface GetUserResponse {
-  login: string;
-  id: number;
-  avatar_url: string;
-}
-
-export async function getUser(): Promise<GetUserResponse> {
-  const response = await fetch("https://api.github.com/users/Dhani078", {
-    method: "GET"
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP error ${response.status}`);
-  }
-  return response.json();
+export interface ApiResponse {
+  cartId: number;
+  active: boolean;
 }
 ```
 
----
-
-2. Convert Authenticated POST Request With JSON Body
-Command:
+Scenario 2: Nested Object Hierarchy
 ```bash
-npx curl-to-ts "curl -X POST https://api.stripe.com/v1/charges -H 'Authorization: Bearer tok_123' -d 'amount=2000&currency=usd'"
+$ npx curl-to-ts "curl -X POST https://api.com/profile -d '{\"user\": {\"id\": \"usr_1\", \"settings\": {\"theme\": \"dark\", \"notifications\": true}}}'" --name UserProfile
+
+export interface Settings {
+  theme: string;
+  notifications: boolean;
+}
+
+export interface User {
+  id: string;
+  settings: Settings;
+}
+
+export interface UserProfile {
+  user: User;
+}
 ```
 
----
-
-3. Generate Standalone TypeScript File
-Command:
+Scenario 3: Array of Primitive and Object Elements
 ```bash
-npx curl-to-ts --input request.sh --output src/api/client.ts
+$ npx curl-to-ts "curl -d '{\"tags\": [\"fast\", \"secure\"], \"metrics\": [{\"name\": \"cpu\", \"val\": 98.4}]}'" --name MetricsPayload
+
+export interface Metric {
+  name: string;
+  val: number;
+}
+
+export interface MetricsPayload {
+  tags: string[];
+  metrics: Metric[];
+}
+```
+
+Scenario 4: Reading cURL from File
+```bash
+$ cat request.curl | npx curl-to-ts --name FilePayload
+```
+
+Scenario 5: Emitting Readonly Properties
+```bash
+$ npx curl-to-ts "curl -d '{\"apiKey\": \"key_123\"}'" --readonly
+
+export interface ApiResponse {
+  readonly apiKey: string;
+}
 ```

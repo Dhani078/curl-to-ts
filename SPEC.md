@@ -1,29 +1,24 @@
 SPECIFICATION: curl-to-ts
 
-1. Scope and Objective
+1. Scope and Technical Purpose
+curl-to-ts parses cURL command syntax, extracts HTTP metadata, parses JSON request or response bodies, and compiles structural TypeScript interface declarations.
 
-curl-to-ts parses POSIX and Windows cURL command lines and emits valid, formatted TypeScript code that re-implements the request using the native Fetch API standard.
+2. Parsing Grammar and Extraction
+- Method Extraction: Matches -X <METHOD> or infers POST if -d or --data is present, otherwise defaults to GET.
+- URL Extraction: Extracts scheme, host, port, path, and search parameters.
+- Header Extraction: Matches -H 'Header-Name: Value' headers into key-value map.
+- Body Extraction: Matches -d, --data, --data-raw, or --data-binary payloads.
 
-2. Syntax Parsing Requirements
+3. Type Inference Rules
+- string: Values wrapped in quotes or ISO dates.
+- number: Floating point or integer numeric literals.
+- boolean: Literal true or false.
+- null: Null literals (inferred as any or unknown if isolated).
+- Array<T>: Arrays where all elements match type T.
+- (T | U)[]: Heterogeneous arrays with multiple distinct element types.
+- InterfaceName: Objects with child properties extracted to separate named interface.
 
-2.1. Flags Supported
-- Method: -X, --request (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
-- Headers: -H, --header (Key: Value parsing with quote stripping)
-- Data: -d, --data, --data-raw, --data-binary (JSON object inference and string escape handling)
-- URL: Positional URL argument or explicit --url flag
-- Authentication: -u, --user (Basic auth encoding to standard Base64 header)
-- Compression: --compressed (Flag handled without breaking output)
-
-2.2. Type Inference Engine
-- String detection: Quoted values, dates, URLs, email addresses.
-- Number detection: Digits, integers, floating point values.
-- Boolean detection: true, false literals.
-- Array detection: Homogeneous and heterogeneous array structures.
-- Nullable detection: null values flagged as optional or union with null.
-
-3. Exit Codes
-
-- 0: Successful parse and TypeScript output generation.
-- 1: Failed to parse cURL command string (syntax error or unclosed quotes).
-- 2: Invalid options supplied.
-- 3: Destination file write failure.
+4. Exit Codes
+- 0: Successful parse and generation.
+- 1: Malformed cURL command or unparseable JSON payload.
+- 2: Missing input argument.

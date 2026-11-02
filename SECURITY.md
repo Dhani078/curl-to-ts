@@ -1,12 +1,12 @@
 SECURITY POLICY: curl-to-ts
 
-Data Handling Guarantees
+1. Security Posture and Data Privacy
+curl-to-ts is frequently fed proprietary API request snippets containing authorization headers, session tokens, and business payloads.
+- Complete In-Memory Isolation: Input strings are never saved to disk or temporary cache files.
+- Zero Network Activity: No telemetry, logging, or remote calls.
+- Safe Evaluation: Does not use eval() or Function() constructor to parse input. Uses secure JSON.parse with regex tokenizer.
 
-- Completely Offline: No external HTTP calls are ever made by curl-to-ts.
-- Private Credentials: Authorization headers and cookies found in cURL commands are transformed into runtime parameters so tokens are never baked into generated files.
-
-Vulnerability Reporting
-
-Report issues to:
+2. Vulnerability Reporting
+For security disclosures:
 - Maintainer: Dhani078
-- Email: dhanisepeda@gmail.com
+- Security Contact: dhanisepeda@gmail.com

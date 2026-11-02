@@ -5,99 +5,104 @@ curl-to-ts
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-green.svg)](https://nodejs.org/)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](#)
 
-Instant, zero-dependency cURL to TypeScript SDK generator. Converts raw cURL commands and browser network exports into clean, fully-typed native fetch functions and interfaces.
+Instant cURL to TypeScript type interface generator CLI. Parses HTTP request headers, method, parameters, and payload data into strongly typed TypeScript contracts in milliseconds with zero dependencies.
 
 ---
 
-The Problem
+THE PROBLEM
 
-Developers copy cURL requests from browser network tabs, Postman, or API documentation multiple times a day:
-- Writing typed fetch wrappers manually takes 10 to 20 minutes per endpoint.
-- Headers, authorization tokens, query params, and JSON payloads are prone to copy-paste typos.
-- Existing online converters either require heavy dependencies or send API tokens to third-party servers.
-
----
-
-The Solution
-
-curl-to-ts parses cURL command syntax locally using a deterministic tokenizer:
-- Extracts HTTP method, URL, query string, headers, and body.
-- Infers TypeScript interfaces for request body and parameters.
-- Generates a standalone TypeScript function using native global fetch.
-- Zero network requests. Completely offline and private.
+Translating raw cURL commands and API documentation payloads into TypeScript is tedious and error-prone:
+- Manually inspecting JSON payloads to declare type interfaces wastes engineering time.
+- Nested JSON objects and heterogeneous arrays require manual recursive typing.
+- Copy-pasting from API documentation introduces typos in property names.
+- Online conversion websites pose security and privacy risks by exposing proprietary API structures and credentials.
+- Existing tools pull hundreds of dependencies or require heavy GUI editors.
 
 ---
 
-Installation and Usage
+THE SOLUTION
 
-Run directly via npx:
+curl-to-ts provides zero-dependency native conversion:
+- Parses cURL command arguments into method, URL, headers, and body payload.
+- Infers TypeScript primitive types (string, number, boolean, null, object, arrays).
+- Handles recursive nested objects and heterogeneous arrays with union typing.
+- Generates clean, production-ready interface definitions ready to paste into codebase.
+- Operates 100 percent locally in under 20 milliseconds.
+
+---
+
+QUICKSTART
+
+Convert cURL directly via command line:
 
 ```bash
-npx curl-to-ts "curl -X POST https://api.example.com/v1/orders -H 'Authorization: Bearer token123' -d '{\"item\":\"laptop\",\"qty\":1}'"
+npx curl-to-ts "curl -X POST https://api.example.com/v1/users -H 'Content-Type: application/json' -d '{\"name\": \"Dhani\", \"age\": 25, \"isAdmin\": true}'"
 ```
 
-Save generated SDK directly to a file:
+Pipe cURL command from clipboard or file:
 
 ```bash
-npx curl-to-ts "curl https://api.example.com/users/42" --out src/api/user.ts
+cat curl.txt | npx curl-to-ts
 ```
 
-Read cURL command from clipboard or standard input:
+Specify custom interface name:
 
 ```bash
-cat curl.txt | npx curl-to-ts --stdin
+npx curl-to-ts "curl -d '{\"id\": 101, \"status\": \"active\"}' https://api.example.com" --name UserStatus
 ```
 
 ---
 
-Generated Code Example
+COMMAND MATRIX
 
-Input:
-```bash
-curl -X POST https://api.example.com/items -H "Content-Type: application/json" -d '{"name":"widget","price":25}'
+Command | Argument | Description | Default
+--- | --- | --- | ---
+curl-to-ts | [curl-command] | Parse command string and output TypeScript | Required argument or stdin
+curl-to-ts --stdin | None | Read cURL command from standard input | Reads process.stdin
+curl-to-ts --help | None | Print comprehensive command list and flags | Flag
+curl-to-ts --version | None | Print current semantic version | Flag
+
+---
+
+CLI OPTIONS
+
+- `--name <InterfaceName>`: Set root interface identifier (default: ApiResponse).
+- `--prefix <prefix>`: Add prefix to generated types (e.g., I, Api).
+- `--readonly`: Mark all generated properties with readonly modifier.
+- `--optional`: Mark properties with null or missing data as optional (?).
+- `--json`: Output parsed AST and type schema as JSON.
+
+---
+
+INTERACTIVE WORKFLOW PREVIEW
+
 ```
+$ npx curl-to-ts "curl -X POST https://api.example.com/orders -d '{\"orderId\": \"ORD-9821\", \"amount\": 149.50, \"items\": [{\"sku\": \"A1\", \"qty\": 2}], \"paid\": true}'" --name OrderPayload
 
-Output:
-```typescript
-export interface CreateItemsPayload {
-  name: string;
-  price: number;
+export interface OrderItem {
+  sku: string;
+  qty: number;
 }
 
-export interface CreateItemsOptions {
-  headers?: Record<string, string>;
-  signal?: AbortSignal;
-}
-
-export async function createItems(
-  payload: CreateItemsPayload,
-  options: CreateItemsOptions = {}
-): Promise<Response> {
-  const url = "https://api.example.com/items";
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    body: JSON.stringify(payload),
-    signal: options.signal,
-  });
+export interface OrderPayload {
+  orderId: string;
+  amount: number;
+  items: OrderItem[];
+  paid: boolean;
 }
 ```
 
 ---
 
-CLI Options
+DATA SAFETY GUARANTEES
 
-- `--out <path>`: Write generated TypeScript code to specified file path.
-- `--function-name <name>`: Custom name for the exported TypeScript function.
-- `--zod`: Generate Zod validation schema alongside TypeScript interface.
-- `--named-params`: Pack URL path parameters into an options object.
-- `--stdin`: Read input string from standard input stream.
+- Offline Standard Library: Built purely with native Node.js string and regex processing.
+- Zero Remote Calls: Operates in memory with zero network exposure.
 
 ---
 
-Author
+LICENSE AND AUTHOR
 
-Dhani078
+- License: MIT License
+- Author: Dhani078 (dhanisepeda@gmail.com)
+- Source Repository: https://github.com/Dhani078/curl-to-ts
